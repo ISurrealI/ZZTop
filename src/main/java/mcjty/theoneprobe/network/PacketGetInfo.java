@@ -7,7 +7,6 @@ import mcjty.theoneprobe.api.*;
 import mcjty.theoneprobe.apiimpl.ProbeHitData;
 import mcjty.theoneprobe.apiimpl.ProbeInfo;
 import mcjty.theoneprobe.config.ConfigSetup;
-import mcjty.theoneprobe.items.ModItems;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -114,18 +113,6 @@ public class PacketGetInfo implements IMessage {
     }
 
     private static ProbeInfo getProbeInfo(EntityPlayer player, ProbeMode mode, World world, BlockPos blockPos, EnumFacing sideHit, Vec3d hitVec, ItemStack pickBlock) {
-        if (ConfigSetup.needsProbe == PROBE_NEEDEDFOREXTENDED) {
-            // We need a probe only for extended information
-            if (!ModItems.hasAProbeSomewhere(player)) {
-                // No probe anywhere, switch EXTENDED to NORMAL
-                if (mode == ProbeMode.EXTENDED) {
-                    mode = ProbeMode.NORMAL;
-                }
-            }
-        } else if (ConfigSetup.needsProbe == PROBE_NEEDEDHARD && !ModItems.hasAProbeSomewhere(player)) {
-            // The server says we need a probe but we don't have one in our hands
-            return null;
-        }
 
         IBlockState state = world.getBlockState(blockPos);
         ProbeInfo probeInfo = TheOneProbe.theOneProbeImp.create();

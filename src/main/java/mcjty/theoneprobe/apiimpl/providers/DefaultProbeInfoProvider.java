@@ -1,15 +1,11 @@
 package mcjty.theoneprobe.apiimpl.providers;
 
-import mcjty.lib.api.power.IBigPower;
 import mcjty.theoneprobe.TheOneProbe;
 import mcjty.theoneprobe.Tools;
 import mcjty.theoneprobe.api.*;
 import mcjty.theoneprobe.apiimpl.ProbeConfig;
 import mcjty.theoneprobe.apiimpl.elements.ElementProgress;
-import mcjty.theoneprobe.compat.RedstoneFluxTools;
-import mcjty.theoneprobe.compat.TeslaTools;
 import mcjty.theoneprobe.config.ConfigSetup;
-import mcjty.theoneprobe.setup.ModSetup;
 import net.minecraft.block.*;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
@@ -211,19 +207,7 @@ public class DefaultProbeInfoProvider implements IProbeInfoProvider {
     private void showRF(IProbeInfo probeInfo, World world, BlockPos pos) {
         ProbeConfig config = ConfigSetup.getDefaultConfig();
         TileEntity te = world.getTileEntity(pos);
-        if (ModSetup.tesla && TeslaTools.isEnergyHandler(te)) {
-            long energy = TeslaTools.getEnergy(te);
-            long maxEnergy = TeslaTools.getMaxEnergy(te);
-            addRFInfo(probeInfo, config, energy, maxEnergy);
-        } else if (te instanceof IBigPower) {
-            long energy = ((IBigPower) te).getStoredPower();
-            long maxEnergy = ((IBigPower) te).getCapacity();
-            addRFInfo(probeInfo, config, energy, maxEnergy);
-        } else if (ModSetup.redstoneflux && RedstoneFluxTools.isEnergyHandler(te)) {
-            int energy = RedstoneFluxTools.getEnergy(te);
-            int maxEnergy = RedstoneFluxTools.getMaxEnergy(te);
-            addRFInfo(probeInfo, config, energy, maxEnergy);
-        } else if (te != null && te.hasCapability(CapabilityEnergy.ENERGY, null)) {
+        if (te != null && te.hasCapability(CapabilityEnergy.ENERGY, null)) {
             net.minecraftforge.energy.IEnergyStorage handler = te.getCapability(CapabilityEnergy.ENERGY, null);
             if (handler != null) {
                 addRFInfo(probeInfo, config, handler.getEnergyStored(), handler.getMaxEnergyStored());
@@ -235,7 +219,7 @@ public class DefaultProbeInfoProvider implements IProbeInfoProvider {
         if (config.getRFMode() == 1) {
             probeInfo.progress(energy, maxEnergy,
                     probeInfo.defaultProgressStyle()
-                            .suffix("RF")
+                            .suffix("FE")
                             .filledColor(ConfigSetup.rfbarFilledColor)
                             .alternateFilledColor(ConfigSetup.rfbarAlternateFilledColor)
                             .borderColor(ConfigSetup.rfbarBorderColor)
@@ -320,6 +304,6 @@ public class DefaultProbeInfoProvider implements IProbeInfoProvider {
     }
 
     private static String getBlockUnlocalizedName(Block block) {
-        return STARTLOC + block.getUnlocalizedName() + ".name" + ENDLOC;
+        return STARTLOC + block.getTranslationKey() + ".name" + ENDLOC;
     }
 }

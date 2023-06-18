@@ -54,6 +54,9 @@ fabric.properties
 # *.ipr
 
 
+# Run
+run/
+
 ### Windows ###
 # Windows image file caches
 Thumbs.db

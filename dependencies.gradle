@@ -1,0 +1,16 @@
+repositories {
+    exclusiveContent {
+        forRepository {
+            maven {
+                url 'https://cursemaven.com/'
+            }
+        }
+        filter {
+            includeGroup 'curse.maven'
+        }
+    }
+}
+
+dependencies {
+    // implementationOnly 'curse.maven:erebus-220698:3211974'
+}

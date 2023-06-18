@@ -4,7 +4,6 @@ import mcjty.theoneprobe.api.ProbeMode;
 import mcjty.theoneprobe.config.ConfigSetup;
 import mcjty.theoneprobe.gui.GuiConfig;
 import mcjty.theoneprobe.gui.GuiNote;
-import mcjty.theoneprobe.items.ModItems;
 import mcjty.theoneprobe.keys.KeyBindings;
 import mcjty.theoneprobe.rendering.OverlayRenderer;
 import net.minecraft.client.Minecraft;
@@ -52,31 +51,15 @@ public class ClientForgeEventHandlers {
             }
         }
 
-        if (hasItemInEitherHand(ModItems.creativeProbe)) {
+        if (Minecraft.getMinecraft().player.isCreative()) {
             OverlayRenderer.renderHUD(ProbeMode.DEBUG, event.getPartialTicks());
         } else {
-            switch (ConfigSetup.needsProbe) {
-                case PROBE_NOTNEEDED:
-                case PROBE_NEEDEDFOREXTENDED:
-                    OverlayRenderer.renderHUD(getModeForPlayer(), event.getPartialTicks());
-                    break;
-                case PROBE_NEEDED:
-                case PROBE_NEEDEDHARD:
-                    if (ModItems.hasAProbeSomewhere(Minecraft.getMinecraft().player)) {
-                        OverlayRenderer.renderHUD(getModeForPlayer(), event.getPartialTicks());
-                    }
-                    break;
-            }
+            OverlayRenderer.renderHUD(getModeForPlayer(), event.getPartialTicks());
         }
     }
 
     private ProbeMode getModeForPlayer() {
         EntityPlayerSP player = Minecraft.getMinecraft().player;
-        if (ConfigSetup.extendedInMain) {
-            if (hasItemInMainHand(ModItems.probe)) {
-                return ProbeMode.EXTENDED;
-            }
-        }
         return player.isSneaking() ? ProbeMode.EXTENDED : ProbeMode.NORMAL;
     }
 
