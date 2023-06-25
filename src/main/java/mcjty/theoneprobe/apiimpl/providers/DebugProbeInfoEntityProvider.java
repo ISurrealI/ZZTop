@@ -7,6 +7,7 @@ import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.IProbeInfoEntityProvider;
 import mcjty.theoneprobe.api.ProbeMode;
 import mcjty.theoneprobe.apiimpl.styles.LayoutStyle;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAgeable;
 import net.minecraft.entity.EntityLivingBase;
@@ -26,8 +27,11 @@ public class DebugProbeInfoEntityProvider implements IProbeInfoEntityProvider {
     @Override
     public void addProbeEntityInfo(ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, Entity entity, IProbeHitEntityData data) {
         if (mode == ProbeMode.DEBUG && ConfigSetup.showDebugInfo) {
-            IProbeInfo vertical = null;
+
+            IProbeInfo vertical;
+
             if (entity instanceof EntityLivingBase) {
+
                 vertical = probeInfo.vertical(new LayoutStyle().borderColor(0xffff4444).spacing(2));
 
                 EntityLivingBase entityLivingBase = (EntityLivingBase) entity;
@@ -36,23 +40,23 @@ public class DebugProbeInfoEntityProvider implements IProbeInfoEntityProvider {
                 float absorptionAmount = entityLivingBase.getAbsorptionAmount();
                 float aiMoveSpeed = entityLivingBase.getAIMoveSpeed();
                 int revengeTimer = entityLivingBase.getRevengeTimer();
-                vertical
-                        .text(LABEL + "Tot armor: " + INFO + totalArmorValue)
-                        .text(LABEL + "Age: " + INFO + age)
-                        .text(LABEL + "Absorption: " + INFO + absorptionAmount)
-                        .text(LABEL + "AI Move Speed: " + INFO + aiMoveSpeed)
-                        .text(LABEL + "Revenge Timer: " + INFO + revengeTimer);
-            }
-            if (entity instanceof EntityAgeable) {
-                if (vertical == null) {
-                    vertical = probeInfo.vertical(new LayoutStyle().borderColor(0xffff4444).spacing(2));
-                }
 
-                EntityAgeable entityAgeable = (EntityAgeable) entity;
-                int growingAge = entityAgeable.getGrowingAge();
                 vertical
-                        .text(LABEL + "Growing Age: " + INFO + growingAge);
+                        .text(LABEL + I18n.format("top.debug.entity.armor", "" + INFO + totalArmorValue))
+                        .text(LABEL + I18n.format("top.debug.entity.age", "" + INFO + age))
+                        .text(LABEL + I18n.format("top.debug.entity.absorption", "" + INFO + absorptionAmount))
+                        .text(LABEL + I18n.format("top.debug.entity.move_speed", "" + INFO + aiMoveSpeed))
+                        .text(LABEL + I18n.format("top.debug.entity.revenge_timer", "" + INFO + revengeTimer));
+
+                if (entity instanceof EntityAgeable) {
+
+                    EntityAgeable entityAgeable = (EntityAgeable) entity;
+                    int growingAge = entityAgeable.getGrowingAge();
+                    vertical
+                            .text(LABEL + I18n.format("top.debug.entity.growing_age", "" + INFO + growingAge));
+                }
             }
+
         }
     }
 }

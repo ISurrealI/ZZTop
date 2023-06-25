@@ -17,8 +17,8 @@ import net.minecraft.util.ResourceLocation;
 public interface IProbeInfo {
 
     /// Use STARTLOC/ENDLOC in your strings for localization on the client
-    public static final String STARTLOC = "{*";
-    public static final String ENDLOC = "*}";
+    String STARTLOC = "{*";
+    String ENDLOC = "*}";
 
     /**
      * Create a default layout style for the horizontal or vertical elements

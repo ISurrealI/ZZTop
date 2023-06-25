@@ -8,6 +8,7 @@ import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.config.ConfigSetup;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -52,16 +53,16 @@ public class HarvestInfoTools {
             } else {
                 harvestName = harvestLevels[harvestLevel];
             }
-            probeInfo.text(LABEL + "Tool: " + INFO + harvestTool + " (level " + harvestName + ")");
+            probeInfo.text(LABEL + I18n.format("top.block.tool",   "" + INFO + harvestTool) + " " + I18n.format("top.block.level", harvestLevel));
         }
     }
 
     static void showCanBeHarvested(IProbeInfo probeInfo, World world, BlockPos pos, Block block, EntityPlayer player) {
         boolean harvestable = block.canHarvestBlock(world, pos, player) && world.getBlockState(pos).getBlockHardness(world, pos) >= 0;
         if (harvestable) {
-            probeInfo.text(OK + "Harvestable");
+            probeInfo.text(OK + I18n.format("top.block.harvestable"));
         } else {
-            probeInfo.text(WARNING + "Not harvestable");
+            probeInfo.text(WARNING + I18n.format("top.block.not_harvestable"));
         }
     }
 
@@ -81,7 +82,6 @@ public class HarvestInfoTools {
 
                     if (testTool != null && testTool.getItem() instanceof ItemTool) {
                         ItemTool toolItem = (ItemTool) testTool.getItem();
-                        // @todo
                         if (testTool.getDestroySpeed(blockState) >= toolItem.toolMaterial.getEfficiency()) {
                             // BINGO!
                             harvestTool = testToolEntry.getKey();
@@ -114,14 +114,14 @@ public class HarvestInfoTools {
         IProbeInfo horizontal = probeInfo.horizontal(alignment);
         if (harvestable) {
             horizontal.icon(ICONS, 0, offs, dim, dim, iconStyle)
-                    .text(OK + ((harvestTool != null) ? harvestTool : "No tool"));
-        } else {
+                    .text(OK + ((harvestTool != null) ? harvestTool : I18n.format("top.block.no_tool")));
+        } else { // TODO Fix this or whatever
             if (harvestName == null || harvestName.isEmpty()) {
                 horizontal.icon(ICONS, 16, offs, dim, dim, iconStyle)
-                        .text(WARNING + ((harvestTool != null) ? harvestTool : "No tool"));
+                        .text(WARNING + ((harvestTool != null) ? harvestTool : I18n.format("top.block.no_tool")));
             } else {
                 horizontal.icon(ICONS, 16, offs, dim, dim, iconStyle)
-                        .text(WARNING + ((harvestTool != null) ? harvestTool : "No tool") + " (level " + harvestName + ")");
+                        .text(WARNING + ((harvestTool != null) ? harvestTool : I18n.format("top.block.no_tool")) + " " + I18n.format("top.block.level", harvestName));
             }
         }
     }

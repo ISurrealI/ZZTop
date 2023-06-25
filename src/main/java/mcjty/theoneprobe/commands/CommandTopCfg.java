@@ -36,7 +36,7 @@ public class CommandTopCfg implements ICommand {
         return "topcfg [ " + args + " ]";
     }
 
-    private static Map<String,Consumer<String[]>> SUBCOMMANDS = new HashMap<>();
+    private static final Map<String,Consumer<String[]>> SUBCOMMANDS = new HashMap<>();
 
     static {
         SUBCOMMANDS.put("center", s -> ConfigSetup.setPos(-1, -1, -1, -1));
@@ -58,6 +58,7 @@ public class CommandTopCfg implements ICommand {
         SUBCOMMANDS.put("dontcompactequalstacks", s -> ConfigSetup.setCompactEqualStacks(false));
         SUBCOMMANDS.put("extendedinmain", s -> ConfigSetup.setExtendedInMain(true));
         SUBCOMMANDS.put("defaultinmain", s -> ConfigSetup.setExtendedInMain(false));
+        SUBCOMMANDS.put("debug", s -> ConfigSetup.setDebugMode(!ConfigSetup.debugMode));
     }
 
 

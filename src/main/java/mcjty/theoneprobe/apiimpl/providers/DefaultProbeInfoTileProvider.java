@@ -10,6 +10,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockBrewingStand;
 import net.minecraft.block.BlockMobSpawner;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -69,11 +70,10 @@ public class DefaultProbeInfoTileProvider implements IProbeInfoProvider {
                 int fuel = ((TileEntityBrewingStand) te).getField(1);
                 probeInfo.horizontal(probeInfo.defaultLayoutStyle().alignment(ElementAlignment.ALIGN_CENTER))
                         .item(new ItemStack(Items.BLAZE_POWDER), probeInfo.defaultItemStyle().width(16).height(16))
-                        .text(LABEL + "Fuel: " + INFO + fuel);
+                        .text(LABEL + I18n.format("top.block.brewer.fuel", "" + INFO + fuel));
                 if (brewtime > 0) {
-                    probeInfo.text(LABEL + "Time: " + INFO + brewtime + " ticks");
+                    probeInfo.text(LABEL + I18n.format("top.block.brewer.time", "" + INFO + brewtime + " ticks"));
                 }
-
             }
         }
     }
@@ -86,7 +86,7 @@ public class DefaultProbeInfoTileProvider implements IProbeInfoProvider {
                 String mobName = logic.getCachedEntity().getName();
                 probeInfo.horizontal(probeInfo.defaultLayoutStyle()
                                 .alignment(ElementAlignment.ALIGN_CENTER))
-                        .text(LABEL + "Mob: " + INFO + mobName);
+                        .text(LABEL + I18n.format("top.block.spawner.mob", "" + INFO + mobName));
             }
         }
     }
@@ -114,18 +114,18 @@ public class DefaultProbeInfoTileProvider implements IProbeInfoProvider {
     private void addFluidInfo(IProbeInfo probeInfo, ProbeConfig config, FluidStack fluidStack, int maxContents) {
         int contents = fluidStack == null ? 0 : fluidStack.amount;
         if (fluidStack != null) {
-            probeInfo.text(NAME + "Liquid: " + fluidStack.getLocalizedName());
+            probeInfo.text(NAME + I18n.format("top.block.liquid", fluidStack.getLocalizedName()));
         }
         if (config.getTankMode() == 1) {
             probeInfo.progress(contents, maxContents,
                     probeInfo.defaultProgressStyle()
-                            .suffix("mB")
+                            .suffix(I18n.format("top.fluid"))
                             .filledColor(ConfigSetup.tankbarFilledColor)
                             .alternateFilledColor(ConfigSetup.tankbarAlternateFilledColor)
                             .borderColor(ConfigSetup.tankbarBorderColor)
                             .numberFormat(ConfigSetup.tankFormat));
         } else {
-            probeInfo.text(PROGRESS + ElementProgress.format(contents, ConfigSetup.tankFormat, "mB"));
+            probeInfo.text(PROGRESS + ElementProgress.format(contents, ConfigSetup.tankFormat, I18n.format("top.fluid")));
         }
     }
 
@@ -144,13 +144,14 @@ public class DefaultProbeInfoTileProvider implements IProbeInfoProvider {
         if (config.getRFMode() == 1) {
             probeInfo.progress(energy, maxEnergy,
                     probeInfo.defaultProgressStyle()
-                            .suffix("FE")
+                            .suffix(I18n.format("top.energy"))
                             .filledColor(ConfigSetup.rfbarFilledColor)
                             .alternateFilledColor(ConfigSetup.rfbarAlternateFilledColor)
                             .borderColor(ConfigSetup.rfbarBorderColor)
                             .numberFormat(ConfigSetup.rfFormat));
         } else {
-            probeInfo.text(PROGRESS + "RF: " + ElementProgress.format(energy, ConfigSetup.rfFormat, "RF"));
+            String suffix = I18n.format("top.energy");
+            probeInfo.text(PROGRESS + suffix + ": " + ElementProgress.format(energy, ConfigSetup.rfFormat, suffix));
         }
     }
 }

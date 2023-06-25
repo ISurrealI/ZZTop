@@ -191,6 +191,10 @@ public class ConfigSetup {
 
     }
 
+    public static void setDebugMode(boolean b) {
+        debugMode = b;
+    }
+
     public static void setProbeNeeded(int probeNeeded) {
         Configuration cfg = mainConfig;
         ConfigSetup.needsProbe = probeNeeded;

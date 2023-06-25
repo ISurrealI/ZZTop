@@ -7,6 +7,7 @@ import mcjty.theoneprobe.config.ConfigSetup;
 import net.minecraft.block.*;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -87,7 +88,7 @@ public class DefaultProbeInfoProvider implements IProbeInfoProvider {
         if (redstonePower > 0) {
             probeInfo.horizontal()
                     .item(new ItemStack(Items.REDSTONE), probeInfo.defaultItemStyle().width(14).height(14))
-                    .text(LABEL + "Power: " + INFO + redstonePower);
+                    .text(LABEL + I18n.format("top.block.power", "" + INFO + redstonePower));
         }
     }
 
@@ -95,16 +96,16 @@ public class DefaultProbeInfoProvider implements IProbeInfoProvider {
         if (block instanceof BlockLever) {
             Boolean powered = blockState.getValue(BlockLever.POWERED);
             probeInfo.horizontal().item(new ItemStack(Items.REDSTONE), probeInfo.defaultItemStyle().width(14).height(14))
-                    .text(LABEL + "State: " + INFO + (powered ? "On" : "Off"));
+                    .text(LABEL + I18n.format("top.block.lever.state", INFO + (powered ? "On" : "Off")));
         } else if (block instanceof BlockRedstoneComparator) {
             BlockRedstoneComparator.Mode mode = blockState.getValue(BlockRedstoneComparator.MODE);
-            probeInfo.text(LABEL + "Mode: " + INFO + mode.getName());
+            probeInfo.text(LABEL + I18n.format("top.block.lever.mode", INFO + mode.getName()));
         } else if (block instanceof BlockRedstoneRepeater) {
             Boolean locked = blockState.getValue(BlockRedstoneRepeater.LOCKED);
             Integer delay = blockState.getValue(BlockRedstoneRepeater.DELAY);
-            probeInfo.text(LABEL + "Delay: " + INFO + delay + " ticks");
+            probeInfo.text(LABEL + I18n.format("top.block.lever.delay", "" + INFO + delay + " ticks"));
             if (locked) {
-                probeInfo.text(INFO + "Locked");
+                probeInfo.text(INFO + I18n.format("top.block.lever.locked"));
             }
         }
     }
@@ -117,9 +118,9 @@ public class DefaultProbeInfoProvider implements IProbeInfoProvider {
                 int age = blockState.getValue(integerProperty);
                 int maxAge = Collections.max(integerProperty.getAllowedValues());
                 if (age == maxAge) {
-                    probeInfo.text(OK + "Fully grown");
+                    probeInfo.text(OK + I18n.format("top.block.fully_grown"));
                 } else {
-                    probeInfo.text(LABEL + "Growth: " + WARNING + (age * 100) / maxAge + "%");
+                    probeInfo.text(LABEL + I18n.format("top.block.growth", "" + WARNING + (age * 100) / maxAge + "%"));
                 }
             }
             return;

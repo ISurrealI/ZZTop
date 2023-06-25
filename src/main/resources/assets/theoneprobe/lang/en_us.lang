@@ -1,12 +1,66 @@
+# Suffix
+top.fluid=mB
+top.energy=FE
+
+# Block Providers
+top.block.tool=Tool: %s
+top.block.no_tool=No Tool
+top.block.level=(level %s)
+top.block.harvestable=Harvestable
+top.block.not_harvestable=Not Harvestable
+
+top.block.power=Power: %s
+
+top.debug.block.registry_name=Reg Name: %s
+top.debug.block.translation_key=Translation Key: %s
+top.debug.block.meta=Meta: %s
+top.debug.block.class=Class: %s
+top.debug.block.hardness=Hardness: %s
+top.debug.block.weak_power=Weak Power: %s
+top.debug.block.strong_power=Strong Power: %s
+top.debug.block.light_level=Light: %s
+top.debug.block.tile_entity=TE: %s
+
+top.block.lever.state=State: %s
+top.block.lever.mode=Mode: %s
+top.block.lever.delay=Delay: %s
+top.block.lever.locked=Locked
+
+top.block.fully_grown=Fully Grown
+top.block.growth=Growth: %s
+
+top.block.brewer.fuel=Fuel: %s
+top.block.brewer.time=Time: %s Ticks
+
+top.block.spawner.mob=Mob: %s
+
+top.block.liquid=Liquid: %s
+
+# Entity Providers
+top.entity.health=Health: %s
+
+top.debug.entity.armor=Total Armor: %s
+top.debug.entity.age=Age: %s
+top.debug.entity.absorption=Absorption: %s
+top.debug.entity.move_speed=Move Speed: %s
+top.debug.entity.revenge_timer=Revenge Timer: %s
+top.debug.entity.growing_age=Growing Age: %s
+
+top.entity.owner=Owned by: %s
+top.entity.owner.unknown=Unknown Owner
+top.entity.tameable=Tameable
+
+top.entity.growing_time=Growing Time: %s
+
+top.entity.horse.jump_height=Jump Height: %s
+top.entity.horse.speed=Speed: %s
+
+top.entity.wolf.collar=Collar Color: %s
+
+top.entity.item_frame.rotation=Rotation: %s
+top.entity.item_frame.empty=Empty
+
+# Keys
 key.toggleLiquids=Toggle Liquid View
 key.toggleVisible=Visibility Toggle
 key.categories.theoneprobe=The One Probe
-item.theoneprobe.probe.name=The One Probe
-item.theoneprobe.probe_goggles.name=The One Probe (Bauble)
-item.theoneprobe.diamond_helmet_probe.name=Diamond Helmet with Probe
-item.theoneprobe.gold_helmet_probe.name=Gold Helmet with Probe
-item.theoneprobe.iron_helmet_probe.name=Iron Helmet with Probe
-item.theoneprobe.creativeprobe.name=The Creative Probe
-item.theoneprobe.probenote.name=The One Probe Read Me
-
-itemGroup.Probe=The One Probe

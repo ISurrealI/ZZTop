@@ -7,7 +7,9 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
@@ -85,5 +87,56 @@ public class Tools {
         } else if (player.isSneaking()) mode = ProbeMode.EXTENDED;
 
         return mode;
+    }
+
+    public static String upperecacs(String name) {
+
+        StringBuilder builder = new StringBuilder().append(Character.toUpperCase(name.charAt(0)));
+
+        boolean b = false;
+        for (int i = 1; i < name.length(); i++) {
+
+
+            char ch = name.charAt(i);
+
+            if (b) {
+                builder.append(Character.toUpperCase(ch));
+                b = false;
+                continue;
+            }
+
+            if (ch == '_') {
+                builder.append(' ');
+                b = true;
+                continue;
+            }
+
+            builder.append(ch);
+        }
+
+        return builder.toString();
+    }
+
+    public static TextFormatting getFormatFromColor(EnumDyeColor color) {
+        switch (color) {
+            default: return TextFormatting.WHITE;
+            case ORANGE:
+            case BROWN:
+                return TextFormatting.GOLD;
+            case MAGENTA:
+            case PINK:
+                return TextFormatting.LIGHT_PURPLE;
+            case LIGHT_BLUE: return TextFormatting.AQUA;
+            case YELLOW: return TextFormatting.YELLOW;
+            case LIME: return TextFormatting.GREEN;
+            case GRAY: return TextFormatting.DARK_GRAY;
+            case SILVER: return TextFormatting.GRAY;
+            case CYAN: return TextFormatting.DARK_AQUA;
+            case PURPLE: return TextFormatting.DARK_PURPLE;
+            case BLUE: return TextFormatting.DARK_BLUE;
+            case GREEN: return TextFormatting.DARK_GREEN;
+            case RED: return TextFormatting.DARK_RED;
+            case BLACK: return TextFormatting.BLACK;
+        }
     }
 }
