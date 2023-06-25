@@ -13,7 +13,7 @@ public interface IProbeInfoProvider {
 
     /**
      * Return a unique ID (usually combined with the modid) to identify this provider.
-     * @return
+     * @return uniqe id like modid:provider_name
      */
     String getID();
 
@@ -24,4 +24,8 @@ public interface IProbeInfoProvider {
      * will cause them to be grouped vertically.
      */
     void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState blockState, IProbeHitData data);
+
+    default boolean onlyClientSide() {
+        return false;
+    }
 }

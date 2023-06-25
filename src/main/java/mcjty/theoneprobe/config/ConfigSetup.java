@@ -1,6 +1,7 @@
 package mcjty.theoneprobe.config;
 
 
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import mcjty.theoneprobe.TheOneProbe;
 import mcjty.theoneprobe.api.IOverlayStyle;
 import mcjty.theoneprobe.api.IProbeConfig;
@@ -16,10 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static mcjty.theoneprobe.api.TextStyleClass.*;
 
@@ -90,8 +88,10 @@ public class ConfigSetup {
     public static int tankbarAlternateFilledColor = 0xff000043;
     public static int tankbarBorderColor = 0xff555555;
 
+    public static boolean debugMode = false;
+
     public static Map<TextStyleClass, String> defaultTextStyleClasses = new HashMap<>();
-    public static Map<TextStyleClass, String> textStyleClasses = new HashMap<>();
+    public static Map<TextStyleClass, String> textStyleClasses;
 
     static {
         defaultTextStyleClasses.put(NAME, "white");
@@ -110,6 +110,9 @@ public class ConfigSetup {
     public static int loggingThrowableTimeout = 20000;
 
     public static boolean showCollarColor = true;
+
+    public static Set<String> excludedProviders = null;
+    public static Set<String> excludedEntityProviders = null;
 
     private static IOverlayStyle defaultOverlayStyle;
     private static ProbeConfig defaultConfig = new ProbeConfig();
@@ -161,6 +164,9 @@ public class ConfigSetup {
         dontShowContentsUnlessSneaking = cfg.getStringList("dontShowContentsUnlessSneaking", CATEGORY_THEONEPROBE, dontShowContentsUnlessSneaking, "A list of blocks for which we don't show chest contents automatically except if sneaking");
         dontSendNBT = cfg.getStringList("dontSendNBT", CATEGORY_THEONEPROBE, dontSendNBT, "A list of blocks for which we don't send NBT over the network. This is mostly useful for blocks that have HUGE NBT in their pickblock (itemstack)");
 
+        excludedProviders = getExcludedProviders();
+        excludedEntityProviders = getExcludedEntityProviders();
+
         setupStyleConfig(cfg);
     }
 
@@ -210,6 +216,7 @@ public class ConfigSetup {
         chestContentsBorderColor = parseColor(cfg.getString("chestContentsBorderColor", CATEGORY_CLIENT, Integer.toHexString(chestContentsBorderColor), "Color of the border of the chest contents box (0 to disable)"));
         showBreakProgress = cfg.getInt("showBreakProgress", CATEGORY_CLIENT, showBreakProgress, 0, 2, "0 means don't show break progress, 1 is show as bar, 2 is show as text");
         harvestStyleVanilla = cfg.getBoolean("harvestStyleVanilla", CATEGORY_CLIENT, harvestStyleVanilla, "true means shows harvestability with vanilla style icons");
+        debugMode = cfg.getBoolean("debugMode", CATEGORY_CLIENT, debugMode, "Shows details like unlocalized name, registry name etc. inside a red border");
 
         Map<TextStyleClass, String> newformat = new HashMap<>();
         for (TextStyleClass styleClass : textStyleClasses.keySet()) {
@@ -383,5 +390,23 @@ public class ConfigSetup {
         } catch (Exception e1) {
             TheOneProbe.setup.getLogger().log(Level.ERROR, "Problem loading config file!", e1);
         }
+    }
+
+    public static Set<String> getExcludedProviders() {
+        Set<String> set = new ObjectOpenHashSet<>();
+        String[] excludedProviders = ConfigSetup.mainConfig.getStringList("excludedProviders", ConfigSetup.CATEGORY_PROVIDERS, new String[] {}, "Providers that should be excluded");
+
+        Collections.addAll(set, excludedProviders);
+
+        return set;
+    }
+
+    public static Set<String> getExcludedEntityProviders() {
+        Set<String> set = new ObjectOpenHashSet<>();
+        String[] excludedProviders = ConfigSetup.mainConfig.getStringList("excludedEntityProviders", ConfigSetup.CATEGORY_PROVIDERS, new String[] {}, "Entity providers that should be excluded");
+
+        Collections.addAll(set, excludedProviders);
+
+        return set;
     }
 }

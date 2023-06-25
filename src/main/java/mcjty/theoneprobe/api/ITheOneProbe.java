@@ -3,7 +3,7 @@ package mcjty.theoneprobe.api;
 /**
  * Main interface for this mod. Use this to build probe information
  * Get a reference to an implementation of this interface by calling:
- *         FMLInterModComms.sendFunctionMessage("theoneprobe", "getTheOneProbe", "<whatever>.YourClass$GetTheOneProbe");
+ *         FMLInterModComms.sendFunctionMessage("theoneprobe", "getTheOneProbe", "whatever.YourClass$GetTheOneProbe");
  */
 public interface ITheOneProbe {
 

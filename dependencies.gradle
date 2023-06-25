@@ -12,5 +12,5 @@ repositories {
 }
 
 dependencies {
-    // implementationOnly 'curse.maven:erebus-220698:3211974'
+    // runtimeOnly 'curse.maven:erebus-220698:3211974'
 }

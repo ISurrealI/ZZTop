@@ -1,9 +1,9 @@
 package mcjty.theoneprobe;
 
 import mcjty.theoneprobe.config.ConfigSetup;
-import mcjty.theoneprobe.playerdata.PlayerGotNote;
-import mcjty.theoneprobe.playerdata.PlayerProperties;
-import mcjty.theoneprobe.playerdata.PropertiesDispatcher;
+import mcjty.theoneprobe.capability.player.PlayerFirstSpawn;
+import mcjty.theoneprobe.capability.player.PlayerProperties;
+import mcjty.theoneprobe.capability.player.FirstSpawnCapability;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
@@ -28,8 +28,8 @@ public class ForgeEventHandlers {
     @SubscribeEvent
     public void onEntityConstructing(AttachCapabilitiesEvent<Entity> event){
         if (event.getObject() instanceof EntityPlayer) {
-            if (!event.getObject().hasCapability(PlayerProperties.PLAYER_GOT_NOTE, null)) {
-                event.addCapability(new ResourceLocation(TheOneProbe.MODID, "Properties"), new PropertiesDispatcher());
+            if (!event.getObject().hasCapability(PlayerProperties.PLAYER_ALREADY_SPAWNED, null)) {
+                event.addCapability(new ResourceLocation(TheOneProbe.MODID, "Properties"), new FirstSpawnCapability());
             }
         }
     }
@@ -38,9 +38,9 @@ public class ForgeEventHandlers {
     public void onPlayerCloned(PlayerEvent.Clone event) {
         if (event.isWasDeath()) {
             // We need to copyFrom the capabilities
-            if (event.getOriginal().hasCapability(PlayerProperties.PLAYER_GOT_NOTE, null)) {
-                PlayerGotNote oldStore = event.getOriginal().getCapability(PlayerProperties.PLAYER_GOT_NOTE, null);
-                PlayerGotNote newStore = PlayerProperties.getPlayerGotNote(event.getEntityPlayer());
+            if (event.getOriginal().hasCapability(PlayerProperties.PLAYER_ALREADY_SPAWNED, null)) {
+                PlayerFirstSpawn oldStore = event.getOriginal().getCapability(PlayerProperties.PLAYER_ALREADY_SPAWNED, null);
+                PlayerFirstSpawn newStore = PlayerProperties.getPlayerGotNote(event.getEntityPlayer());
                 newStore.copyFrom(oldStore);
             }
         }
@@ -49,9 +49,9 @@ public class ForgeEventHandlers {
     @SubscribeEvent
     public void onPlayerLoggedIn(net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent event) {
         if (ConfigSetup.spawnNote) {
-            PlayerGotNote note = PlayerProperties.getPlayerGotNote(event.player);
-            if (!note.isPlayerGotNote()) {
-                note.setPlayerGotNote(true);
+            PlayerFirstSpawn note = PlayerProperties.getPlayerGotNote(event.player);
+            if (!note.isPlayerAlreadySpawned()) {
+                note.setAlreadySpawned(true);
             }
         }
     }

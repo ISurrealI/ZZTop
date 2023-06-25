@@ -2,7 +2,10 @@ package mcjty.theoneprobe;
 
 import mcjty.theoneprobe.api.IProbeConfig;
 import mcjty.theoneprobe.api.ProbeMode;
+import mcjty.theoneprobe.config.ConfigSetup;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Loader;
@@ -69,5 +72,18 @@ public class Tools {
 
     public static boolean show(ProbeMode mode, IProbeConfig.ConfigMode cfg) {
         return cfg == NORMAL || (cfg == EXTENDED && mode == ProbeMode.EXTENDED);
+    }
+
+    public static ProbeMode getModeForPlayer() {
+        EntityPlayerSP player = Minecraft.getMinecraft().player;
+
+        ProbeMode mode = ProbeMode.NORMAL;
+
+        if (player.isCreative()) {
+            if (ConfigSetup.debugMode) mode = ProbeMode.DEBUG;
+            else mode = ProbeMode.EXTENDED;
+        } else if (player.isSneaking()) mode = ProbeMode.EXTENDED;
+
+        return mode;
     }
 }

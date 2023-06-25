@@ -3,18 +3,17 @@ package mcjty.theoneprobe.network;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import mcjty.theoneprobe.TheOneProbe;
-import mcjty.theoneprobe.api.*;
+import mcjty.theoneprobe.Tools;
+import mcjty.theoneprobe.api.IProbeInfoProvider;
+import mcjty.theoneprobe.api.ProbeMode;
 import mcjty.theoneprobe.apiimpl.ProbeHitData;
 import mcjty.theoneprobe.apiimpl.ProbeInfo;
 import mcjty.theoneprobe.config.ConfigSetup;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -22,13 +21,6 @@ import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-
-import java.util.List;
-
-import static mcjty.theoneprobe.api.TextStyleClass.ERROR;
-import static mcjty.theoneprobe.api.TextStyleClass.LABEL;
-import static mcjty.theoneprobe.config.ConfigSetup.PROBE_NEEDEDFOREXTENDED;
-import static mcjty.theoneprobe.config.ConfigSetup.PROBE_NEEDEDHARD;
 
 public class PacketGetInfo implements IMessage {
 
@@ -38,6 +30,8 @@ public class PacketGetInfo implements IMessage {
     private EnumFacing sideHit;
     private Vec3d hitVec;
     private ItemStack pickBlock;
+
+    private ProbeInfo info;
 
     @Override
     public void fromBytes(ByteBuf buf) {
@@ -54,6 +48,9 @@ public class PacketGetInfo implements IMessage {
             hitVec = new Vec3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
         }
         pickBlock = ByteBufUtils.readItemStack(buf);
+
+        info = new ProbeInfo();
+        info.fromBytes(buf);
     }
 
     @Override
@@ -81,18 +78,21 @@ public class PacketGetInfo implements IMessage {
             ItemStack copy = new ItemStack(pickBlock.getItem(), pickBlock.getCount(), pickBlock.getMetadata());
             ByteBufUtils.writeItemStack(buf, copy);
         }
+
+        info.toBytes(buf);
     }
 
     public PacketGetInfo() {
     }
 
-    public PacketGetInfo(int dim, BlockPos pos, ProbeMode mode, RayTraceResult mouseOver, ItemStack pickBlock) {
+    public PacketGetInfo(int dim, BlockPos pos, ProbeMode mode, RayTraceResult mouseOver, ItemStack pickBlock, ProbeInfo info) {
         this.dim = dim;
         this.pos = pos;
         this.mode = mode;
         this.sideHit = mouseOver.sideHit;
         this.hitVec = mouseOver.hitVec;
         this.pickBlock = pickBlock;
+        this.info = info;
     }
 
     public static class Handler implements IMessageHandler<PacketGetInfo, IMessage> {
@@ -105,36 +105,12 @@ public class PacketGetInfo implements IMessage {
         private void handle(PacketGetInfo message, MessageContext ctx) {
             WorldServer world = DimensionManager.getWorld(message.dim);
             if (world != null) {
-                ProbeInfo probeInfo = getProbeInfo(ctx.getServerHandler().player,
-                        message.mode, world, message.pos, message.sideHit, message.hitVec, message.pickBlock);
-                PacketHandler.INSTANCE.sendTo(new PacketReturnInfo(message.dim, message.pos, probeInfo), ctx.getServerHandler().player);
+                for (IProbeInfoProvider provider : TheOneProbe.theOneProbeImp.getProviders()) {
+                    provider.addProbeInfo(Tools.getModeForPlayer(), message.info, ctx.getServerHandler().player, world, world.getBlockState(message.pos), new ProbeHitData(message.pos, message.hitVec, message.sideHit, message.pickBlock));
+                }
+
+                PacketHandler.INSTANCE.sendTo(new PacketReturnInfo(message.dim, message.pos, message.info), ctx.getServerHandler().player);
             }
         }
     }
-
-    private static ProbeInfo getProbeInfo(EntityPlayer player, ProbeMode mode, World world, BlockPos blockPos, EnumFacing sideHit, Vec3d hitVec, ItemStack pickBlock) {
-
-        IBlockState state = world.getBlockState(blockPos);
-        ProbeInfo probeInfo = TheOneProbe.theOneProbeImp.create();
-        IProbeHitData data = new ProbeHitData(blockPos, hitVec, sideHit, pickBlock);
-
-        IProbeConfig probeConfig = TheOneProbe.theOneProbeImp.createProbeConfig();
-        List<IProbeConfigProvider> configProviders = TheOneProbe.theOneProbeImp.getConfigProviders();
-        for (IProbeConfigProvider configProvider : configProviders) {
-            configProvider.getProbeConfig(probeConfig, player, world, state, data);
-        }
-        ConfigSetup.setRealConfig(probeConfig);
-
-        List<IProbeInfoProvider> providers = TheOneProbe.theOneProbeImp.getProviders();
-        for (IProbeInfoProvider provider : providers) {
-            try {
-                provider.addProbeInfo(mode, probeInfo, player, world, state, data);
-            } catch (Throwable e) {
-                ThrowableIdentity.registerThrowable(e);
-                probeInfo.text(LABEL + "Error: " + ERROR + provider.getID());
-            }
-        }
-        return probeInfo;
-    }
-
 }

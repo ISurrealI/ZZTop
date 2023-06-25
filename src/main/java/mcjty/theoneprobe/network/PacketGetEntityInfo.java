@@ -32,6 +32,7 @@ public class PacketGetEntityInfo implements IMessage {
     private UUID uuid;
     private ProbeMode mode;
     private Vec3d hitVec;
+    private ProbeInfo info;
 
     @Override
     public void fromBytes(ByteBuf buf) {
@@ -41,6 +42,8 @@ public class PacketGetEntityInfo implements IMessage {
         if (buf.readBoolean()) {
             hitVec = new Vec3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
         }
+        this.info = new ProbeInfo();
+        this.info.fromBytes(buf);
     }
 
     @Override
@@ -57,16 +60,18 @@ public class PacketGetEntityInfo implements IMessage {
             buf.writeDouble(hitVec.y);
             buf.writeDouble(hitVec.z);
         }
+        this.info.toBytes(buf);
     }
 
     public PacketGetEntityInfo() {
     }
 
-    public PacketGetEntityInfo(int dim, ProbeMode mode, RayTraceResult mouseOver, Entity entity) {
+    public PacketGetEntityInfo(int dim, ProbeMode mode, RayTraceResult mouseOver, Entity entity, ProbeInfo info) {
         this.dim = dim;
         this.uuid = entity.getPersistentID();
         this.mode = mode;
         this.hitVec = mouseOver.hitVec;
+        this.info = info;
     }
 
     public static class Handler implements IMessageHandler<PacketGetEntityInfo, IMessage> {
@@ -81,8 +86,8 @@ public class PacketGetEntityInfo implements IMessage {
             if (world != null) {
                 Entity entity = world.getEntityFromUuid(message.uuid);
                 if (entity != null) {
-                    ProbeInfo probeInfo = getProbeInfo(ctx.getServerHandler().player, message.mode, world, entity, message.hitVec);
-                    PacketHandler.INSTANCE.sendTo(new PacketReturnEntityInfo(message.uuid, probeInfo), ctx.getServerHandler().player);
+                    TheOneProbe.theOneProbeImp.getEntityProviders().forEach(p -> p.addProbeEntityInfo(message.mode, message.info, ctx.getServerHandler().player, world, entity, new ProbeHitEntityData(message.hitVec)));
+                    PacketHandler.INSTANCE.sendTo(new PacketReturnEntityInfo(message.uuid, message.info), ctx.getServerHandler().player);
                 }
             }
         }

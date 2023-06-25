@@ -50,4 +50,9 @@ public class DebugProbeInfoProvider implements IProbeInfoProvider {
             vertical.text(LABEL + "TE: " + INFO + te.getClass().getSimpleName());
         }
     }
+
+    @Override
+    public boolean onlyClientSide() {
+        return true;
+    }
 }

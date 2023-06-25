@@ -1,5 +1,6 @@
 package mcjty.theoneprobe.rendering;
 
+import mcjty.theoneprobe.ClientForgeEventHandlers;
 import mcjty.theoneprobe.TheOneProbe;
 import mcjty.theoneprobe.api.*;
 import mcjty.theoneprobe.apiimpl.ProbeHitData;
@@ -7,7 +8,7 @@ import mcjty.theoneprobe.apiimpl.ProbeHitEntityData;
 import mcjty.theoneprobe.apiimpl.ProbeInfo;
 import mcjty.theoneprobe.apiimpl.elements.ElementProgress;
 import mcjty.theoneprobe.apiimpl.elements.ElementText;
-import mcjty.theoneprobe.apiimpl.providers.DefaultProbeInfoEntityProvider;
+import mcjty.theoneprobe.apiimpl.providers.DefaultClientProbeInfoEntityProvider;
 import mcjty.theoneprobe.apiimpl.providers.DefaultProbeInfoProvider;
 import mcjty.theoneprobe.apiimpl.styles.ProgressStyle;
 import mcjty.theoneprobe.config.ConfigSetup;
@@ -206,7 +207,11 @@ public class OverlayRenderer {
     }
 
     private static void requestEntityInfo(ProbeMode mode, RayTraceResult mouseOver, Entity entity, EntityPlayerSP player) {
-        PacketHandler.INSTANCE.sendToServer(new PacketGetEntityInfo(player.getEntityWorld().provider.getDimension(), mode, mouseOver, entity));
+        ProbeInfo info = ProbeInfo.getProbeInfo(player, mode, player.getEntityWorld(), entity, mouseOver.hitVec);
+
+        if (ClientForgeEventHandlers.serverHasMod)
+            PacketHandler.INSTANCE.sendToServer(new PacketGetEntityInfo(player.getEntityWorld().provider.getDimension(), mode, mouseOver, entity, info));
+        else registerProbeInfo(entity.getPersistentID(), info);
     }
 
     private static void renderHUDBlock(ProbeMode mode, RayTraceResult mouseOver, double sw, double sh) {
@@ -309,7 +314,7 @@ public class OverlayRenderer {
 
         IProbeConfig probeConfig = TheOneProbe.theOneProbeImp.createProbeConfig();
         try {
-            DefaultProbeInfoEntityProvider.showStandardInfo(mode, probeInfo, entity, probeConfig);
+            DefaultClientProbeInfoEntityProvider.showStandardInfo(mode, probeInfo, entity, probeConfig);
         } catch (Exception e) {
             ThrowableIdentity.registerThrowable(e);
             probeInfo.text(ERROR + "Error (see log for details)!");
@@ -324,15 +329,23 @@ public class OverlayRenderer {
         IBlockState blockState = world.getBlockState(blockPos);
         Block block = blockState.getBlock();
         ItemStack pickBlock = block.getPickBlock(blockState, mouseOver, world, blockPos, player);
+
         if (pickBlock == null || (!pickBlock.isEmpty() && pickBlock.getItem() == null)) {
             // Protection for some invalid items.
             pickBlock = ItemStack.EMPTY;
         }
-        if (pickBlock != null && (!pickBlock.isEmpty()) && ConfigSetup.getDontSendNBTSet().contains(pickBlock.getItem().getRegistryName())) {
-            pickBlock = pickBlock.copy();
+
+        if (!pickBlock.isEmpty() && ConfigSetup.getDontSendNBTSet().contains(pickBlock.getItem().getRegistryName())) {
             pickBlock.setTagCompound(null);
         }
-        PacketHandler.INSTANCE.sendToServer(new PacketGetInfo(world.provider.getDimension(), blockPos, mode, mouseOver, pickBlock));
+
+        ProbeInfo info = ProbeInfo.getProbeInfo(player, mode, world, blockPos, mouseOver.sideHit, mouseOver.hitVec, pickBlock);
+
+        if (ClientForgeEventHandlers.serverHasMod && world.getTileEntity(blockPos) != null) {
+            PacketHandler.INSTANCE.sendToServer(new PacketGetInfo(world.provider.getDimension(), blockPos, mode, mouseOver, pickBlock, info));
+        } else {
+            registerProbeInfo(world.provider.getDimension(), blockPos, info);
+        }
     }
 
     public static void renderOverlay(IOverlayStyle style, IProbeInfo probeInfo) {

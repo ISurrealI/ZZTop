@@ -1,6 +1,5 @@
 package mcjty.theoneprobe;
 
-import mavengroup.zzTOP.Tags;
 import mcjty.theoneprobe.api.ITheOneProbe;
 import mcjty.theoneprobe.apiimpl.TheOneProbeImp;
 import mcjty.theoneprobe.setup.IProxy;

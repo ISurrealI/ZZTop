@@ -7,21 +7,23 @@ import mcjty.theoneprobe.gui.GuiNote;
 import mcjty.theoneprobe.keys.KeyBindings;
 import mcjty.theoneprobe.rendering.OverlayRenderer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumHand;
+import net.minecraft.network.INetHandler;
+import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraft.network.play.INetHandlerPlayClient;
+import net.minecraft.network.play.INetHandlerPlayServer;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-
-import static mcjty.theoneprobe.config.ConfigSetup.*;
+import net.minecraftforge.fml.common.gameevent.InputEvent;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 
 public class ClientForgeEventHandlers {
 
     public static boolean ignoreNextGuiClose = false;
+    public static boolean serverHasMod = false;
 
     @SubscribeEvent
     public void onGuiOpen(GuiOpenEvent event) {
@@ -29,7 +31,7 @@ public class ClientForgeEventHandlers {
             GuiScreen current = Minecraft.getMinecraft().currentScreen;
             if (event.getGui() == null && (current instanceof GuiConfig || current instanceof GuiNote)) {
                 ignoreNextGuiClose = false;
-                // We don't want our gui to be closed for a new 'null' guil
+                // We don't want our gui to be closed for a new 'null' gui
                 event.setCanceled(true);
             }
         }
@@ -51,28 +53,26 @@ public class ClientForgeEventHandlers {
             }
         }
 
-        if (Minecraft.getMinecraft().player.isCreative()) {
-            OverlayRenderer.renderHUD(ProbeMode.DEBUG, event.getPartialTicks());
-        } else {
-            OverlayRenderer.renderHUD(getModeForPlayer(), event.getPartialTicks());
+        OverlayRenderer.renderHUD(Tools.getModeForPlayer(), event.getPartialTicks());
+    }
+
+    @SubscribeEvent
+    public void onKeyInput(InputEvent.KeyInputEvent event) {
+        if (KeyBindings.toggleLiquids.isPressed()) {
+            ConfigSetup.setLiquids(!ConfigSetup.showLiquids);
+        } else if (KeyBindings.toggleVisible.isPressed()) {
+            if (!ConfigSetup.holdKeyToMakeVisible) {
+                ConfigSetup.setVisible(!ConfigSetup.isVisible);
+            }
+//        } else if (KeyBindings.generateLag.isPressed()) {
+//            PacketHandler.INSTANCE.sendToServer(new PacketGenerateLag());
         }
     }
 
-    private ProbeMode getModeForPlayer() {
-        EntityPlayerSP player = Minecraft.getMinecraft().player;
-        return player.isSneaking() ? ProbeMode.EXTENDED : ProbeMode.NORMAL;
-    }
-
-    private boolean hasItemInEitherHand(Item item) {
-        ItemStack mainHeldItem = Minecraft.getMinecraft().player.getHeldItem(EnumHand.MAIN_HAND);
-        ItemStack offHeldItem = Minecraft.getMinecraft().player.getHeldItem(EnumHand.OFF_HAND);
-        return (mainHeldItem != null && mainHeldItem.getItem() == item) ||
-                (offHeldItem != null && offHeldItem.getItem() == item);
-    }
-
-
-    private boolean hasItemInMainHand(Item item) {
-        ItemStack mainHeldItem = Minecraft.getMinecraft().player.getHeldItem(EnumHand.MAIN_HAND);
-        return mainHeldItem != null && mainHeldItem.getItem() == item;
+    @SubscribeEvent
+    public void onCustomPacketRegisteration(FMLNetworkEvent.CustomPacketRegistrationEvent<INetHandler> event) {
+        if (event.getOperation().equals("REGISTER") && event.getRegistrations().contains("theoneprobe") && event.getHandler() instanceof INetHandlerPlayServer) {
+            serverHasMod = true;
+        }
     }
 }

@@ -1,5 +1,8 @@
 package mcjty.theoneprobe.apiimpl;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import mcjty.theoneprobe.config.ConfigSetup;
 import mcjty.theoneprobe.TheOneProbe;
 import mcjty.theoneprobe.api.*;
@@ -18,13 +21,18 @@ public class TheOneProbeImp implements ITheOneProbe {
     public static int ELEMENT_ICON;
     public static int ELEMENT_ITEMLABEL;
 
-    private List<IProbeConfigProvider> configProviders = new ArrayList<>();
+    private List<IProbeConfigProvider> configProviders = new ObjectArrayList<>();
 
-    private List<IProbeInfoProvider> providers = new ArrayList<>();
-    private List<IProbeInfoEntityProvider> entityProviders = new ArrayList<>();
-    private List<IBlockDisplayOverride> blockOverrides = new ArrayList<>();
-    private List<IEntityDisplayOverride> entityOverrides = new ArrayList<>();
-    private Map<Integer,IElementFactory> factories = new HashMap<>();
+    private List<IProbeInfoProvider> providers = new ObjectArrayList<>();
+    private List<IProbeInfoProvider> clientProviders = new ObjectArrayList<>();
+
+    private List<IProbeInfoEntityProvider> entityProviders = new ObjectArrayList<>();
+    private List<IProbeInfoEntityProvider> entityClientProviders = new ObjectArrayList<>();
+    private final List<IBlockDisplayOverride> blockOverrides = new ObjectArrayList<>();
+    private final List<IEntityDisplayOverride> entityOverrides = new ObjectArrayList<>();
+
+
+    private final Map<Integer,IElementFactory> factories = new Int2ObjectOpenHashMap<>();
     private int lastId = 0;
 
     public TheOneProbeImp() {
@@ -41,41 +49,20 @@ public class TheOneProbeImp implements ITheOneProbe {
         ELEMENT_ITEMLABEL = TheOneProbe.theOneProbeImp.registerElementFactory(ElementItemLabel::new);
     }
 
-    private int findProvider(String id) {
-        for (int i = 0 ; i < providers.size() ; i++) {
-            if (id.equals(providers.get(i).getID())) {
-                return i;
-            }
-        }
-        return -1;
-    }
 
     @Override
     public void registerProvider(IProbeInfoProvider provider) {
-        int idx = findProvider(provider.getID());
-        if (idx != -1) {
-            providers.set(idx, provider);
-        } else {
-            providers.add(provider);
+        if (!ConfigSetup.excludedProviders.contains(provider.getID())) {
+            if (provider.onlyClientSide()) clientProviders.add(provider);
+            else providers.add(provider);
         }
-    }
-
-    private int findEntityProvider(String id) {
-        for (int i = 0 ; i < entityProviders.size() ; i++) {
-            if (id.equals(entityProviders.get(i).getID())) {
-                return i;
-            }
-        }
-        return -1;
     }
 
     @Override
     public void registerEntityProvider(IProbeInfoEntityProvider provider) {
-        int idx = findEntityProvider(provider.getID());
-        if (idx != -1) {
-            entityProviders.set(idx, provider);
-        } else {
-            entityProviders.add(provider);
+        if (!ConfigSetup.excludedEntityProviders.contains(provider.getID())) {
+            if (provider.onlyClientSide()) entityClientProviders.add(provider);
+            else entityProviders.add(provider);
         }
     }
 
@@ -92,70 +79,24 @@ public class TheOneProbeImp implements ITheOneProbe {
         return providers;
     }
 
+    public List<IProbeInfoProvider> getClientProviders() {
+        return clientProviders;
+    }
+
     public List<IProbeInfoEntityProvider> getEntityProviders() {
         return entityProviders;
     }
 
-    private IProbeInfoProvider getProviderByID(String id) {
-        for (IProbeInfoProvider provider : providers) {
-            if (provider.getID().equals(id)) {
-                return provider;
-            }
-        }
-        return null;
+    public List<IProbeInfoEntityProvider> getEntityClientProviders() {
+        return entityClientProviders;
     }
 
-    private IProbeInfoEntityProvider getEntityProviderByID(String id) {
-        for (IProbeInfoEntityProvider provider : entityProviders) {
-            if (provider.getID().equals(id)) {
-                return provider;
-            }
-        }
-        return null;
+    public IProbeInfoProvider getProviderByID(String id) {
+        return providers.get(getIDFromString(id));
     }
 
-    public void configureProviders(String[] sortedProviders, Set<String> excludedProviders) {
-        List<IProbeInfoProvider> newProviders = new ArrayList<>();
-        for (String id : sortedProviders) {
-            if (!excludedProviders.contains(id)) {
-                IProbeInfoProvider provider = getProviderByID(id);
-                if (provider != null) {
-                    newProviders.add(provider);
-                }
-            }
-        }
-
-        // Add all providers that are not in the list of sortedProviders and are also not
-        // excluded.
-        for (IProbeInfoProvider provider : providers) {
-            if ((!newProviders.contains(provider)) && !excludedProviders.contains(provider.getID())) {
-                newProviders.add(provider);
-            }
-        }
-
-        providers = newProviders;
-    }
-
-    public void configureEntityProviders(String[] sortedProviders, Set<String> excludedProviders) {
-        List<IProbeInfoEntityProvider> newProviders = new ArrayList<>();
-        for (String id : sortedProviders) {
-            if (!excludedProviders.contains(id)) {
-                IProbeInfoEntityProvider provider = getEntityProviderByID(id);
-                if (provider != null) {
-                    newProviders.add(provider);
-                }
-            }
-        }
-
-        // Add all providers that are not in the list of sortedProviders and are also not
-        // excluded.
-        for (IProbeInfoEntityProvider provider : entityProviders) {
-            if ((!newProviders.contains(provider)) && !excludedProviders.contains(provider.getID())) {
-                newProviders.add(provider);
-            }
-        }
-
-        entityProviders = newProviders;
+    public IProbeInfoEntityProvider getEntityProviderByID(String id) {
+        return entityProviders.get(getIDFromString(id));
     }
 
     @Override
@@ -201,5 +142,23 @@ public class TheOneProbeImp implements ITheOneProbe {
 
     public List<IEntityDisplayOverride> getEntityOverrides() {
         return entityOverrides;
+    }
+
+    private static int getIDFromString(String name) {
+
+        int i = 0;
+
+        if (name.contains(":")) {
+            String[] strs = name.split(":");
+            for (String str : strs) {
+                i += str.charAt(0) * str.charAt(str.length() / 2) * str.charAt(str.length() - 1) * name.length();
+            }
+
+            return i;
+        } else {
+            i += name.charAt(0) * name.charAt(name.length() / 2) * name.charAt(name.length() - 1) * name.length();
+        }
+
+        return i;
     }
 }

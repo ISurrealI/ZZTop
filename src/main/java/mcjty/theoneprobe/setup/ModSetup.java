@@ -2,13 +2,11 @@ package mcjty.theoneprobe.setup;
 
 import mcjty.theoneprobe.ForgeEventHandlers;
 import mcjty.theoneprobe.TheOneProbe;
-import mcjty.theoneprobe.api.IProbeInfoEntityProvider;
-import mcjty.theoneprobe.api.IProbeInfoProvider;
 import mcjty.theoneprobe.apiimpl.TheOneProbeImp;
 import mcjty.theoneprobe.apiimpl.providers.*;
 import mcjty.theoneprobe.config.ConfigSetup;
 import mcjty.theoneprobe.network.PacketHandler;
-import mcjty.theoneprobe.playerdata.PlayerGotNote;
+import mcjty.theoneprobe.capability.player.PlayerFirstSpawn;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.MinecraftForge;
@@ -23,10 +21,6 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 public class ModSetup {
 
@@ -44,15 +38,20 @@ public class ModSetup {
 
         registerCapabilities();
         TheOneProbeImp.registerElements();
-        TheOneProbe.theOneProbeImp.registerProvider(new DefaultProbeInfoProvider());
-        TheOneProbe.theOneProbeImp.registerProvider(new DebugProbeInfoProvider());
-        TheOneProbe.theOneProbeImp.registerProvider(new BlockProbeInfoProvider());
-        TheOneProbe.theOneProbeImp.registerEntityProvider(new DefaultProbeInfoEntityProvider());
-        TheOneProbe.theOneProbeImp.registerEntityProvider(new DebugProbeInfoEntityProvider());
-        TheOneProbe.theOneProbeImp.registerEntityProvider(new EntityProbeInfoEntityProvider());
 
         modConfigDir = e.getModConfigurationDirectory();
         ConfigSetup.init();
+
+        TheOneProbe.theOneProbeImp.registerProvider(new DefaultProbeInfoProvider());
+        TheOneProbe.theOneProbeImp.registerProvider(new BlockProbeInfoProvider());
+        TheOneProbe.theOneProbeImp.registerEntityProvider(new DefaultClientProbeInfoEntityProvider());
+        TheOneProbe.theOneProbeImp.registerEntityProvider(new EntityProbeInfoEntityProvider());
+        TheOneProbe.theOneProbeImp.registerProvider(new DefaultProbeInfoTileProvider());
+        TheOneProbe.theOneProbeImp.registerEntityProvider(new DefaultProbeInfoEntityProvider());
+
+        TheOneProbe.theOneProbeImp.registerProvider(new DebugProbeInfoProvider());
+        TheOneProbe.theOneProbeImp.registerEntityProvider(new DebugProbeInfoEntityProvider());
+
 
         PacketHandler.registerMessages("theoneprobe");
 
@@ -86,15 +85,15 @@ public class ModSetup {
     }
 
     private static void registerCapabilities(){
-        CapabilityManager.INSTANCE.register(PlayerGotNote.class, new Capability.IStorage<PlayerGotNote>() {
+        CapabilityManager.INSTANCE.register(PlayerFirstSpawn.class, new Capability.IStorage<PlayerFirstSpawn>() {
 
             @Override
-            public NBTBase writeNBT(Capability<PlayerGotNote> capability, PlayerGotNote instance, EnumFacing side) {
+            public NBTBase writeNBT(Capability<PlayerFirstSpawn> capability, PlayerFirstSpawn instance, EnumFacing side) {
                 throw new UnsupportedOperationException();
             }
 
             @Override
-            public void readNBT(Capability<PlayerGotNote> capability, PlayerGotNote instance, EnumFacing side, NBTBase nbt) {
+            public void readNBT(Capability<PlayerFirstSpawn> capability, PlayerFirstSpawn instance, EnumFacing side, NBTBase nbt) {
                 throw new UnsupportedOperationException();
             }
 
@@ -109,43 +108,8 @@ public class ModSetup {
     }
 
     public void postInit(FMLPostInitializationEvent e) {
-        configureProviders();
-        configureEntityProviders();
-
         if (ConfigSetup.mainConfig.hasChanged()) {
             ConfigSetup.mainConfig.save();
         }
-    }
-
-    private void configureProviders() {
-        List<IProbeInfoProvider> providers = TheOneProbe.theOneProbeImp.getProviders();
-        String[] defaultValues = new String[providers.size()];
-        int i = 0;
-        for (IProbeInfoProvider provider : providers) {
-            defaultValues[i++] = provider.getID();
-        }
-
-        String[] sortedProviders = ConfigSetup.mainConfig.getStringList("sortedProviders", ConfigSetup.CATEGORY_PROVIDERS, defaultValues, "Order in which providers should be used");
-        String[] excludedProviders = ConfigSetup.mainConfig.getStringList("excludedProviders", ConfigSetup.CATEGORY_PROVIDERS, new String[] {}, "Providers that should be excluded");
-        Set<String> excluded = new HashSet<>();
-        Collections.addAll(excluded, excludedProviders);
-
-        TheOneProbe.theOneProbeImp.configureProviders(sortedProviders, excluded);
-    }
-
-    private void configureEntityProviders() {
-        List<IProbeInfoEntityProvider> providers = TheOneProbe.theOneProbeImp.getEntityProviders();
-        String[] defaultValues = new String[providers.size()];
-        int i = 0;
-        for (IProbeInfoEntityProvider provider : providers) {
-            defaultValues[i++] = provider.getID();
-        }
-
-        String[] sortedProviders = ConfigSetup.mainConfig.getStringList("sortedEntityProviders", ConfigSetup.CATEGORY_PROVIDERS, defaultValues, "Order in which entity providers should be used");
-        String[] excludedProviders = ConfigSetup.mainConfig.getStringList("excludedEntityProviders", ConfigSetup.CATEGORY_PROVIDERS, new String[] {}, "Entity providers that should be excluded");
-        Set<String> excluded = new HashSet<>();
-        Collections.addAll(excluded, excludedProviders);
-
-        TheOneProbe.theOneProbeImp.configureEntityProviders(sortedProviders, excluded);
     }
 }

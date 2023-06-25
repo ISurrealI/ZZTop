@@ -24,4 +24,8 @@ public interface IProbeInfoEntityProvider {
      * will cause them to be grouped vertically.
      */
     void addProbeEntityInfo(ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, Entity entity, IProbeHitEntityData data);
+
+    default boolean onlyClientSide() {
+        return false;
+    }
 }
