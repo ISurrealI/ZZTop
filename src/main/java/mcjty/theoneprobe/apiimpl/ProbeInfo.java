@@ -61,6 +61,8 @@ public class ProbeInfo extends ElementVertical {
     public static ProbeInfo getProbeInfo(EntityPlayer player, ProbeMode mode, World world, BlockPos blockPos, EnumFacing sideHit, Vec3d hitVec, ItemStack pickBlock) {
 
         IBlockState state = world.getBlockState(blockPos);
+        state = state.getActualState(world, blockPos);
+
         ProbeInfo probeInfo = TheOneProbe.theOneProbeImp.create();
         IProbeHitData data = new ProbeHitData(blockPos, hitVec, sideHit, pickBlock);
 
