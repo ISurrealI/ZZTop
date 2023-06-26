@@ -1,13 +1,12 @@
 [
 {
   "modid": "theoneprobe",
-  "name": "ZZTop",
+  "name": "TOP for All",
   "description": "Get on Top!",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "https://github.com/ISurrealI/ZZTop",
   "authorList": ["Surreal"],
-  "credits": "McJty, the developer of TOP",
-  "logoFile": ""
+  "credits": "McJty, the developer of TOP"
 }
 ]
