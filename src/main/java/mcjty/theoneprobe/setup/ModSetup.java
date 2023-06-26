@@ -27,10 +27,6 @@ public class ModSetup {
     private Logger logger;
     public static File modConfigDir;
 
-    public static boolean baubles = false;
-    public static boolean tesla = false;
-    public static boolean redstoneflux = false;
-
     public void preInit(FMLPreInitializationEvent e) {
         logger = e.getModLog();
 
@@ -54,34 +50,10 @@ public class ModSetup {
 
 
         PacketHandler.registerMessages("theoneprobe");
-
-        setupModCompat();
     }
 
     public Logger getLogger() {
         return logger;
-    }
-
-    private void setupModCompat() {
-        tesla = Loader.isModLoaded("tesla");
-        if (tesla) {
-            logger.log(Level.INFO, "The One Probe Detected TESLA: enabling support");
-        }
-
-        redstoneflux = Loader.isModLoaded("redstoneflux");
-        if (redstoneflux) {
-            logger.log(Level.INFO, "The One Probe Detected RedstoneFlux: enabling support");
-        }
-
-        baubles = Loader.isModLoaded("Baubles") || Loader.isModLoaded("baubles");
-        if (baubles) {
-            if (ConfigSetup.supportBaubles) {
-                logger.log(Level.INFO, "The One Probe Detected Baubles: enabling support");
-            } else {
-                logger.log(Level.INFO, "The One Probe Detected Baubles but support disabled in config");
-                baubles = false;
-            }
-        }
     }
 
     private static void registerCapabilities(){

@@ -7,6 +7,8 @@ import mcjty.theoneprobe.capability.player.FirstSpawnCapability;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
@@ -48,9 +50,10 @@ public class ForgeEventHandlers {
 
     @SubscribeEvent
     public void onPlayerLoggedIn(net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent event) {
-        if (ConfigSetup.spawnNote) {
+        if (ConfigSetup.spawnNotification) {
             PlayerFirstSpawn note = PlayerProperties.getPlayerGotNote(event.player);
             if (!note.isPlayerAlreadySpawned()) {
+                event.player.sendMessage(new TextComponentTranslation("top.notification"));
                 note.setAlreadySpawned(true);
             }
         }
