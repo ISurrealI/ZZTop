@@ -63,7 +63,7 @@ minecraft {
     // Include and use dependencies' Access Transformer files
     useDependencyAccessTransformers = true
 
-    injectedTags.put('TAG_VERSION', project.version)
+    injectedTags.put('TAG_VERSION', '1.4.28')
     injectedTags.put('TAG_NAME', project.mod_name)
 }
 
@@ -203,4 +203,8 @@ idea {
 
 tasks.named("processIdeaSettings").configure {
     dependsOn("injectTags")
+}
+
+compileJava {
+    options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
 }

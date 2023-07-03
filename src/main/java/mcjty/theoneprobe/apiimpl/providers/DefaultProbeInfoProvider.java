@@ -73,18 +73,20 @@ public class DefaultProbeInfoProvider implements IProbeInfoProvider {
         }
     }
 
-    private void showRedstonePower(IProbeInfo probeInfo, World world, IBlockState blockState, IProbeHitData data, Block block,
-                                   boolean showLever) {
+    private void showRedstonePower(IProbeInfo probeInfo, World world, IBlockState blockState, IProbeHitData data, Block block, boolean showLever) {
+
         if (showLever && block instanceof BlockLever) {
             // We are showing the lever setting so we don't show redstone in that case
             return;
         }
+
         int redstonePower;
         if (block instanceof BlockRedstoneWire) {
             redstonePower = blockState.getValue(BlockRedstoneWire.POWER);
         } else {
             redstonePower = world.getRedstonePower(data.getPos(), data.getSideHit().getOpposite());
         }
+
         if (redstonePower > 0) {
             probeInfo.horizontal()
                     .item(new ItemStack(Items.REDSTONE), probeInfo.defaultItemStyle().width(14).height(14))
@@ -110,8 +112,20 @@ public class DefaultProbeInfoProvider implements IProbeInfoProvider {
         }
     }
 
+    // The only downside is block needs to be BlockCrops.
     private void showGrowthLevel(IProbeInfo probeInfo, IBlockState blockState) {
-        for (IProperty<?> property : blockState.getProperties().keySet()) {
+        if (blockState.getBlock() instanceof BlockCrops) {
+            BlockCrops crop = (BlockCrops) blockState.getBlock();
+
+            int age = crop.getAge(blockState);
+            int maxAge = crop.getMaxAge();
+
+            if (age == maxAge) {
+                probeInfo.text(OK + I18n.format("top.block.fully_grown"));
+            }
+            else probeInfo.text(LABEL + I18n.format("top.block.growth", "" + WARNING + (age * 100) / maxAge + "%"));
+        }
+        /*for (IProperty<?> property : blockState.getProperties().keySet()) {
             if(!"age".equals(property.getName())) continue;
             if(property.getValueClass() == Integer.class) {
                 IProperty<Integer> integerProperty = (IProperty<Integer>)property;
@@ -124,7 +138,7 @@ public class DefaultProbeInfoProvider implements IProbeInfoProvider {
                 }
             }
             return;
-        }
+        }*/
     }
 
     public static void showStandardBlockInfo(IProbeConfig config, ProbeMode mode, IProbeInfo probeInfo, IBlockState blockState, Block block, World world,

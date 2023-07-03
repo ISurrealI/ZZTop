@@ -8,6 +8,7 @@ import java.util.Map;
 
 @IFMLLoadingPlugin.Name("ZZTop")
 @IFMLLoadingPlugin.MCVersion(ForgeVersion.mcVersion)
+@IFMLLoadingPlugin.DependsOn("erebus")
 public class TOPPlugin implements IFMLLoadingPlugin {
 
     @Override

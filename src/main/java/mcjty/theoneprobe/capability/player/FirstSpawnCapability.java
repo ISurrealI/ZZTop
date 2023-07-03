@@ -20,6 +20,7 @@ public class FirstSpawnCapability implements ICapabilityProvider, INBTSerializab
     @Override
     public <T> T getCapability(@Nonnull Capability<T> capability, EnumFacing facing) {
         if (capability == PlayerProperties.PLAYER_ALREADY_SPAWNED) {
+            // noinspection unchecked
             return (T) playerFirstSpawn;
         }
 
