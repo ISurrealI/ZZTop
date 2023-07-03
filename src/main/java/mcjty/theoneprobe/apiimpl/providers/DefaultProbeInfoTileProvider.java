@@ -173,6 +173,7 @@ public class DefaultProbeInfoTileProvider implements IProbeInfoProvider {
                     if (rotatingTile instanceof TileEntityWindmill) {
                         TileEntityWindmill windmill = (TileEntityWindmill) rotatingTile;
                         int[] energies = getWindmillPower(windmill);
+                        TheOneProbe.setup.getLogger().info("energy {}, max energy {}", energies[0], energies[1]);
                         addRFInfo(probeInfo, config, energies[0], energies[1]);
                         return;
                     }
@@ -275,7 +276,7 @@ public class DefaultProbeInfoTileProvider implements IProbeInfoProvider {
         }
 
         powers[0] = (int) Math.abs(windmill.turnSpeed * mod * b * (0.5F + windmill.sails * 0.125F) * Config.IEConfig.Machines.dynamo_output);
-        powers[1] = (int) Math.abs(windmill.turnSpeed * mod * b * 0.5F * Config.IEConfig.Machines.dynamo_output);
+        powers[1] = (int) Math.abs(windmill.turnSpeed * mod * b * (0.5F + 8 * 0.125F) * Config.IEConfig.Machines.dynamo_output);
         return powers;
     }
 

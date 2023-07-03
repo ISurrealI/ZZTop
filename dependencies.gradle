@@ -13,5 +13,9 @@ repositories {
 
 dependencies {
     // runtimeOnly 'curse.maven:erebus-220698:3211974'
-    // implementation rfg.deobf('curse.maven:immersive-engineering-231951:2974106')
+
+    compileOnly rfg.deobf('curse.maven:immersive-engineering-231951:2974106')
+
+    if (project.use_immersive_engineering.toBoolean())
+        runtimeOnly 'curse.maven:immersive-engineering-231951:2974106'
 }
