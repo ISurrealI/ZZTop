@@ -1,0 +1,11 @@
+{
+  "package": "mcjty.theoneprobe.core.mixins",
+  "refmap": "mixins.theoneprobe.refmap.json",
+  "target": "@env(DEFAULT)",
+  "minVersion": "0.8",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "BlockPreservedBlockMixin",
+    "TilePreservedBlockMixin"
+  ]
+}

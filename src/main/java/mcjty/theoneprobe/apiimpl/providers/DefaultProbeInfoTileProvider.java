@@ -150,14 +150,14 @@ public class DefaultProbeInfoTileProvider implements IProbeInfoProvider {
         
         if (Loader.isModLoaded("immersiveengineering")) {
             if (te instanceof TileEntityThermoelectricGen) {
-                int[] energyValues = getEnergy(te.getWorld(), te.getPos());
+                int[] energyValues = getThermoelectricEnergy(te.getWorld(), te.getPos());
 
                 if (energyValues[0] != 0) {
                     int maxValue = energyValues[0] * 2/energyValues[1];
                     addRFInfo(probeInfo, config, energyValues[0], maxValue);
                 }
                 else addRFInfo(probeInfo, config, 0, 0);
-
+                
                 return;
             }
             else if (te instanceof TileEntityDynamo) {
@@ -173,7 +173,6 @@ public class DefaultProbeInfoTileProvider implements IProbeInfoProvider {
                     if (rotatingTile instanceof TileEntityWindmill) {
                         TileEntityWindmill windmill = (TileEntityWindmill) rotatingTile;
                         int[] energies = getWindmillPower(windmill);
-                        TheOneProbe.setup.getLogger().info("energy {}, max energy {}", energies[0], energies[1]);
                         addRFInfo(probeInfo, config, energies[0], energies[1]);
                         return;
                     }
@@ -213,7 +212,7 @@ public class DefaultProbeInfoTileProvider implements IProbeInfoProvider {
     }
 
     // Immersive Engineering
-    private int[] getEnergy(World world, BlockPos pos) {
+    private int[] getThermoelectricEnergy(World world, BlockPos pos) {
 
         int[] array = new int[2];
 
