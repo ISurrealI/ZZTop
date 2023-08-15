@@ -14,7 +14,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import java.util.Optional;
 import java.util.function.Function;
 
-@Mod(modid = TheOneProbe.MODID, name = Tags.TAG_NAME, version = Tags.TAG_VERSION, guiFactory = "mcjty.theoneprobe.config.TopModGuiFactory", useMetadata = true)
+@Mod(modid = TheOneProbe.MODID, name = "ZZTop", version = "1.4.28ZZ", guiFactory = "mcjty.theoneprobe.config.TopModGuiFactory", useMetadata = true, dependencies = "after:mixinbooter")
 public class TheOneProbe {
 
     public static final String MODID = "theoneprobe";

@@ -63,8 +63,7 @@ minecraft {
     // Include and use dependencies' Access Transformer files
     useDependencyAccessTransformers = true
 
-    injectedTags.put('TAG_VERSION', '1.4.28')
-    injectedTags.put('TAG_NAME', project.mod_name)
+    injectedTags.put('TAG_VERSION', project.mod_version)
 }
 
 // Generate a group.archives_base_name.Tags class
